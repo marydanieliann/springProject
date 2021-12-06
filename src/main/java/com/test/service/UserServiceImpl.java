@@ -7,16 +7,10 @@ import com.test.model.Address;
 import com.test.model.Status;
 import com.test.model.User;
 import com.test.repository.UserRepository;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +61,8 @@ public class UserServiceImpl implements UserService {
     public void updateById(String name, String email, String password, int id) {
         userRepository.update(name, email, password, id);
     }
+
+
 
     public User findByEmail(String email) throws NotFoundException {
         User user = userRepository.getByEmail(email);
