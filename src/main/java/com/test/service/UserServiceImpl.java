@@ -7,10 +7,15 @@ import com.test.model.Address;
 import com.test.model.Status;
 import com.test.model.User;
 import com.test.repository.UserRepository;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +66,6 @@ public class UserServiceImpl implements UserService {
     public void updateById(String name, String email, String password, int id) {
         userRepository.update(name, email, password, id);
     }
-
 
 
     public User findByEmail(String email) throws NotFoundException {
@@ -124,10 +128,47 @@ public class UserServiceImpl implements UserService {
         String encodedPw = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPw);
         user.setStatus(Status.UNVERIFIED);
-
-        String link = "http://localhost:8081/user/verify?email=" + user.getEmail();
+        String randomCode = RandomString.make(10);
+        user.setReserved_password_token(randomCode);
+        String link = "http://localhost:8080/user/verify?email=" + user.getEmail();
         mailSender.sendSimpleMessage(user.getEmail(), "Verification", link);
         userRepository.save(user);
+    }
+
+    @Transactional
+    @Async
+    @Override
+    public void resetPassword(String email) throws NotFoundException {
+        User user = findByEmail(email);
+        if (user != null) {
+            mailSender.sendSimpleMessage(user.getEmail(), "Your unique reserved password token", user.getReserved_password_token());
+            long milliseconds = System.currentTimeMillis();
+            user.setReserved_password_token_creation_date(milliseconds);
+        } else {
+            throw new NotFoundException("no such user with that email");
+        }
+
+    }
+
+    @Transactional
+    @Override
+    public void updatePassword(String reserved_password_token, String newPassword) throws NotFoundException, BadRequestException {
+       User user = userRepository.findByReservedPasswordToken(reserved_password_token);
+        if (user != null) {
+            long now = System.currentTimeMillis();
+            if ((now - user.getReserved_password_token_creation_date() ) < 60000) {
+                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                String encodedPassword = passwordEncoder.encode(newPassword);
+                user.setPassword(encodedPassword);
+                user.setReserved_password_token(null);
+                userRepository.save(user);
+            }
+            else {
+                throw new BadRequestException("Reserved password token's expiration time has been expired");
+            }
+        }else {
+            throw new NotFoundException("reserved password token does not match");
+        }
     }
 
 }

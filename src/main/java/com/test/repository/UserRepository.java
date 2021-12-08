@@ -23,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User getByEmailAndPassword(String email, String password);
 
+    @Query("SELECT u FROM User u where u.reserved_password_token = :reserved_password_token")
+    User findByReservedPasswordToken(@Param("reserved_password_token") String reserved_password_token);
+
 }

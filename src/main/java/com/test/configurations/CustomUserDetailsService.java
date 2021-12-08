@@ -1,4 +1,5 @@
 package com.test.configurations;
+
 import com.test.exception.NotFoundException;
 import com.test.model.Authority;
 import com.test.model.Status;

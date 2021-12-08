@@ -53,6 +53,12 @@ public class User {
     )
     private List<Authority> authority;
 
+    @Column(name = "reserved_password_token", unique = true, length = 10)
+    private String reserved_password_token;
+
+    @Column(name = "reserved_password_token_creation_date")
+    private long reserved_password_token_creation_date;
+
 
     public User() {
     }
@@ -151,6 +157,21 @@ public class User {
         this.authority = authority;
     }
 
+    public String getReserved_password_token() {
+        return reserved_password_token;
+    }
+
+    public void setReserved_password_token(String reserved_password_token) {
+        this.reserved_password_token = reserved_password_token;
+    }
+
+    public long getReserved_password_token_creation_date() {
+        return reserved_password_token_creation_date;
+    }
+
+    public void setReserved_password_token_creation_date(long reserved_password_token_creation_date) {
+        this.reserved_password_token_creation_date = reserved_password_token_creation_date;
+    }
 
     @Override
     public boolean equals(Object o) {

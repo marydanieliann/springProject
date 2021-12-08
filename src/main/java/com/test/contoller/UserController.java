@@ -84,4 +84,13 @@ public class UserController {
         userService.saveAndVerify(user);
     }
 
+    @GetMapping("/reset-password")
+    public void resetPassword(@RequestParam String email) throws NotFoundException {
+        userService.resetPassword(email);
+    }
+
+    @PutMapping("/update-password")
+    public void updatePassword(@RequestParam String reserved_password_token,@RequestParam String newPassword) throws NotFoundException, BadRequestException {
+        userService.updatePassword(reserved_password_token, newPassword);
+    }
 }

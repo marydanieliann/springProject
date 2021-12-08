@@ -1,4 +1,5 @@
 package com.test.configurations;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -51,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().antMatchers("/user/register").permitAll().antMatchers("/user/register-with-verification").permitAll().antMatchers("/user/verify").permitAll().antMatchers("/user/sending-email").permitAll()
+                .authorizeRequests().antMatchers("/user/register").permitAll().antMatchers("/user/register-with-verification").permitAll().antMatchers("/user/verify").permitAll().antMatchers("/user/sending-email").permitAll().antMatchers("/user/reset-password").permitAll().antMatchers("/user/update-password").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

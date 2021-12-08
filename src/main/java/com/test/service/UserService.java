@@ -5,6 +5,7 @@ import com.test.exception.NotVerifiedException;
 import com.test.model.User;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
@@ -32,5 +33,9 @@ public interface UserService {
     void sendEmail(String email);
 
     void saveAndVerify(User user) throws NotFoundException, NotVerifiedException;
+
+    void resetPassword(String email) throws NotFoundException;
+
+    void updatePassword(String reserved_password_token, String newPassword) throws NotFoundException, BadRequestException;
 
 }
