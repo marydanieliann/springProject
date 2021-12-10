@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 
@@ -25,5 +24,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u FROM User u where u.reserved_password_token = :reserved_password_token")
     User findByReservedPasswordToken(@Param("reserved_password_token") String reserved_password_token);
+
 
 }

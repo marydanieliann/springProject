@@ -1,8 +1,12 @@
 package com.test.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,6 +63,8 @@ public class User {
     @Column(name = "reserved_password_token_creation_date")
     private long reserved_password_token_creation_date;
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate date_of_birthday;
 
     public User() {
     }
@@ -171,6 +177,14 @@ public class User {
 
     public void setReserved_password_token_creation_date(long reserved_password_token_creation_date) {
         this.reserved_password_token_creation_date = reserved_password_token_creation_date;
+    }
+
+    public LocalDate getDate_of_birthday() {
+        return date_of_birthday;
+    }
+
+    public void setDate_of_birthday(LocalDate date_of_birthday) {
+        this.date_of_birthday = date_of_birthday;
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.test.model.Status;
 import com.test.model.User;
 import com.test.repository.UserRepository;
 import net.bytebuddy.utility.RandomString;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +41,10 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public List<User> getAll() {
+    public List<User> getAll(Principal principal) throws Exception {
+        User user = userRepository.getByEmail(principal.getName());
+        LocalDate currentDate = LocalDate.now();
+        checkAge(user.getDate_of_birthday(), currentDate);
         return userRepository.findAll();
     }
 
@@ -124,7 +134,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveAndVerify(User user) throws NotFoundException, NotVerifiedException {
+    public void saveAndVerify(User user) throws Exception {
+        /*LocalDate currentDate = LocalDate.now();
+        checkAge(user.getDate_of_birthday(), currentDate);
+         */
         String encodedPw = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPw);
         user.setStatus(Status.UNVERIFIED);
@@ -150,25 +163,36 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public int checkAge(LocalDate date_of_birthday, LocalDate currentDate) throws Exception {
+        int period = Period.between(date_of_birthday, currentDate).getYears();
+        if (period >= 18) {
+            return period;
+        } else {
+            throw new Exception("age is less tha 18");
+        }
+    }
+
     @Transactional
     @Override
     public void updatePassword(String reserved_password_token, String newPassword) throws NotFoundException, BadRequestException {
-       User user = userRepository.findByReservedPasswordToken(reserved_password_token);
+        User user = userRepository.findByReservedPasswordToken(reserved_password_token);
         if (user != null) {
             long now = System.currentTimeMillis();
-            if ((now - user.getReserved_password_token_creation_date() ) < 60000) {
+            if ((now - user.getReserved_password_token_creation_date()) < 60000) {
                 BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                 String encodedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encodedPassword);
                 user.setReserved_password_token(null);
                 userRepository.save(user);
-            }
-            else {
+            } else {
                 throw new BadRequestException("Reserved password token's expiration time has been expired");
             }
-        }else {
+        } else {
             throw new NotFoundException("reserved password token does not match");
         }
+
+
     }
 
 }

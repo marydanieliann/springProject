@@ -17,6 +17,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,10 +27,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
-    List<User> getAll() {
-        return userService.getAll();
+    List<User> getAll(Principal principal) throws Exception {
+        ///User is authentificated
+        return userService.getAll(principal);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -80,7 +82,7 @@ public class UserController {
     }
 
     @PostMapping("/register-with-verification")
-    public void registerAfterVerification(@RequestBody User user) throws NotVerifiedException, NotFoundException {
+    public void registerAfterVerification(@RequestBody User user) throws Exception {
         userService.saveAndVerify(user);
     }
 
@@ -93,4 +95,6 @@ public class UserController {
     public void updatePassword(@RequestParam String reserved_password_token,@RequestParam String newPassword) throws NotFoundException, BadRequestException {
         userService.updatePassword(reserved_password_token, newPassword);
     }
+
+
 }

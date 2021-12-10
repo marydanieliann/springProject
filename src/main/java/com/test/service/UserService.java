@@ -1,4 +1,5 @@
 package com.test.service;
+
 import com.test.exception.BadRequestException;
 import com.test.exception.NotFoundException;
 import com.test.exception.NotVerifiedException;
@@ -7,10 +8,13 @@ import com.test.model.User;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface UserService {
-    List<User> getAll();
+    List<User> getAll(Principal principal) throws Exception;
 
     void deleteById(int id) throws NotFoundException;
 
@@ -32,10 +36,11 @@ public interface UserService {
 
     void sendEmail(String email);
 
-    void saveAndVerify(User user) throws NotFoundException, NotVerifiedException;
+    void saveAndVerify(User user) throws Exception;
 
     void resetPassword(String email) throws NotFoundException;
 
     void updatePassword(String reserved_password_token, String newPassword) throws NotFoundException, BadRequestException;
 
+    int checkAge(LocalDate date_of_birthday, LocalDate currentDate) throws Exception;
 }
