@@ -2,12 +2,9 @@ package com.test.service;
 
 import com.test.exception.BadRequestException;
 import com.test.exception.NotFoundException;
-import com.test.exception.NotVerifiedException;
 import com.test.model.User;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.time.LocalDate;
 import java.security.Principal;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -18,7 +15,7 @@ public interface UserService {
 
     void deleteById(int id) throws NotFoundException;
 
-    User save(User user1);
+    User save(User user1) throws Exception;
 
     User getById(int id) throws NotFoundException;
 
@@ -27,8 +24,6 @@ public interface UserService {
     User findByEmail(String email) throws NotFoundException;
 
     List<User> getByName(String name);
-
-    void register(User user) throws RuntimeException, NotFoundException;
 
     void login(User user) throws BadRequestException;
 

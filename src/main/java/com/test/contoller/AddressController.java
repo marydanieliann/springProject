@@ -34,7 +34,6 @@ public class AddressController {
         addressService.deleteById(id);
     }
 
-
     @Transactional
     @PutMapping("/{street}/{number}/{city}/{id}")
     public void update(@PathVariable String street,@PathVariable String number,@PathVariable String city, @PathVariable int id) {
@@ -45,19 +44,6 @@ public class AddressController {
     public void create(@RequestBody Address address) {
         addressService.save(address);
     }
-
-    /*@PostMapping
-    Address save(Address address) {
-        return addressService.save(address);
-    }
-
-
-    @PutMapping("/{number}/{street}/{city}")
-    public void save(@PathVariable String number, @PathVariable String street, @PathVariable String city){
-        Address ad = new Address(number, city, street);
-        addressService.save(ad);
-
-    }*/
 
 
 }

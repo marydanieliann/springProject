@@ -32,7 +32,10 @@ public class AddressServiceImpl implements AddressService{
     @Transactional
     @Override
     public Address save(Address address) {
-         return addressRepository.save(address);
+        if(address != null){
+            System.out.println("That address has already been saved");
+        }
+            return addressRepository.save(address);
     }
 
     @Override

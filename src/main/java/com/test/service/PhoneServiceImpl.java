@@ -30,6 +30,9 @@ public class PhoneServiceImpl implements PhoneService{
 
     @Override
     public Phone save(Phone phone) {
+        if(phone != null){
+            System.out.println("Phone already exists");
+        }
         return phoneRepository.save(phone);
     }
 

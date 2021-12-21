@@ -2,13 +2,11 @@ package com.test.service;
 
 import com.test.exception.BadRequestException;
 import com.test.exception.NotFoundException;
-import com.test.exception.NotVerifiedException;
 import com.test.model.Address;
 import com.test.model.Status;
 import com.test.model.User;
 import com.test.repository.UserRepository;
 import net.bytebuddy.utility.RandomString;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,13 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,10 +51,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    @Override
-    public User save(User user) {
-        return userRepository.save(user);
-    }
 
     @Override
     public User getById(int id) throws NotFoundException {
@@ -77,7 +67,7 @@ public class UserServiceImpl implements UserService {
         userRepository.update(name, email, password, id);
     }
 
-
+    @Override
     public User findByEmail(String email) throws NotFoundException {
         User user = userRepository.getByEmail(email);
         if (user == null) {
@@ -86,23 +76,11 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
     public List<User> getByName(String name) {
         return userRepository.getAllByName(name);
     }
 
-    @Transactional
-    @Override
-    public void register(User user) throws NotFoundException, RuntimeException {
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        //karanq grenq es erku toxi poxaren addressServiceImpl.save(user.getAddress();
-        Address address = user.getAddress();
-        addressService.save(address);
-        userRepository.save(user);
-        if (true) {
-            throw new RuntimeException("not found exc");
-        }
-    }
 
     @Override
     public void login(User user) throws BadRequestException {
@@ -134,10 +112,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveAndVerify(User user) throws Exception {
-        /*LocalDate currentDate = LocalDate.now();
-        checkAge(user.getDate_of_birthday(), currentDate);
-         */
+    @Transactional
+    public User save(User user) throws Exception {
         String encodedPw = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPw);
         user.setStatus(Status.UNVERIFIED);
@@ -145,7 +121,18 @@ public class UserServiceImpl implements UserService {
         user.setReserved_password_token(randomCode);
         String link = "http://localhost:8080/user/verify?email=" + user.getEmail();
         mailSender.sendSimpleMessage(user.getEmail(), "Verification", link);
-        userRepository.save(user);
+        user.setStatus(Status.VERIFIED);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public int checkAge(LocalDate date_of_birthday, LocalDate currentDate) throws Exception {
+        int period = Period.between(date_of_birthday, currentDate).getYears();
+        if (period >= 18) {
+            return period;
+        } else {
+            throw new Exception("age is less tha 18");
+        }
     }
 
     @Transactional
@@ -163,15 +150,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public int checkAge(LocalDate date_of_birthday, LocalDate currentDate) throws Exception {
-        int period = Period.between(date_of_birthday, currentDate).getYears();
-        if (period >= 18) {
-            return period;
-        } else {
-            throw new Exception("age is less tha 18");
-        }
-    }
 
     @Transactional
     @Override
@@ -196,3 +174,4 @@ public class UserServiceImpl implements UserService {
     }
 
 }
+

@@ -2,24 +2,16 @@ package com.test.contoller;
 
 import com.test.exception.BadRequestException;
 import com.test.exception.NotFoundException;
-import com.test.exception.NotVerifiedException;
 import com.test.model.User;
 import com.test.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
-import javax.annotation.security.RolesAllowed;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.List;
-import java.util.Locale;
+
 
 @RequestMapping("/user")
 @RestController
@@ -30,7 +22,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     List<User> getAll(Principal principal) throws Exception {
-        ///User is authentificated
+        ///User is authenticated
         return userService.getAll(principal);
     }
 
@@ -56,16 +48,6 @@ public class UserController {
         userService.updateById(name, email, password, id);
     }
 
-    @PostMapping
-    public void create(@RequestBody User user) {
-        userService.save(user);
-    }
-
-    @PostMapping("/register")
-    public void register(@RequestBody User user) throws NotFoundException, RuntimeException {
-        userService.register(user);
-    }
-
     @PostMapping("/login")
     public void login(@RequestBody User user) throws BadRequestException {
         userService.login(user);
@@ -81,9 +63,9 @@ public class UserController {
         userService.sendEmail(email);
     }
 
-    @PostMapping("/register-with-verification")
+    @PostMapping("/registration")
     public void registerAfterVerification(@RequestBody User user) throws Exception {
-        userService.saveAndVerify(user);
+        userService.save(user);
     }
 
     @GetMapping("/reset-password")
@@ -92,7 +74,7 @@ public class UserController {
     }
 
     @PutMapping("/update-password")
-    public void updatePassword(@RequestParam String reserved_password_token,@RequestParam String newPassword) throws NotFoundException, BadRequestException {
+    public void updatePassword(@RequestParam String reserved_password_token, @RequestParam String newPassword) throws NotFoundException, BadRequestException {
         userService.updatePassword(reserved_password_token, newPassword);
     }
 
